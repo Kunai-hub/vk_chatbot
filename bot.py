@@ -56,18 +56,19 @@ class Bot:
     def on_event(self, event):
         """
         Отправляет сообщение назад, если это текст.
+
         :param event: VKBotMessageEvent object
         :return: None
         """
         if event.type == VkBotEventType.MESSAGE_NEW:
-            log.info('Отправка сообщения обратно отправителю')
+            log.debug('Отправка сообщения обратно отправителю')
             self.get_api.messages.send(
                 message=event.object['message']['text'],
                 random_id=random.randint(0, 2 ** 20),
                 peer_id=event.object['message']['peer_id'],
             )
         else:
-            log.debug('Мы пока не умеем обрабатывать событие такого типа: %s', event.type)
+            log.info('Мы пока не умеем обрабатывать событие такого типа: %s', event.type)
 
 
 if __name__ == '__main__':
