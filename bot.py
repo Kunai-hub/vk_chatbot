@@ -9,8 +9,6 @@ except ImportError:
 import vk_api
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 
-
-
 log = logging.getLogger('bot')
 log.setLevel(logging.DEBUG)
 
@@ -34,6 +32,7 @@ class Bot:
 
     Use python 3.11
     """
+
     def __init__(self, group_id, token):
         """
         :param group_id: group id из группы vk.com.
