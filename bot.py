@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import logging
 import random
 
@@ -8,6 +10,7 @@ except ImportError:
 
 import vk_api
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
+
 
 log = logging.getLogger('bot')
 log.setLevel(logging.DEBUG)
@@ -28,9 +31,14 @@ def configure_logging():
 
 class Bot:
     """
-    Echo bot для vk.com.
+    Use python 3.11.
 
-    Use python 3.11
+    Сценарий регистрации на конференцию для бота vk.com.
+    Поддержка ответов на вопросы про дату, место проведения и сценарий регистрации:
+        - спрашиваем имя
+        - спрашиваем email
+        - говорим об успешной регистрации
+    Задаем вопросы до тех пор, пока шаг не будет пройден.
     """
 
     def __init__(self, group_id, token):
@@ -43,9 +51,14 @@ class Bot:
         self.vk_api = vk_api.VkApi(token=token)
         self.long_poller = VkBotLongPoll(self.vk_api, self.group_id)
         self.get_api = self.vk_api.get_api()
+        self.user_states = dict() # user_id -> UserState
 
     def run(self):
-        """Запуск бота."""
+        """
+        Запуск бота.
+
+        :return: None
+        """
         for event in self.long_poller.listen():
             try:
                 self.on_event(event)
