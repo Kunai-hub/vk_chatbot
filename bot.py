@@ -3,15 +3,15 @@
 import logging
 import random
 
+import vk_api
+from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
+
 import handlers
 
 try:
     import settings
 except ImportError:
     exit('Do cp settings.py.default settings.py and set token!')
-
-import vk_api
-from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 
 
 log = logging.getLogger('bot')
@@ -96,7 +96,8 @@ class Bot:
             text_to_send = self.continue_scenario(user_id=user_id, text=text)
         else:
             for intent in settings.INTENTS:
-                if any(token in text for token in intent['tokens']):
+                log.debug(f'Пользователь получил {intent}')
+                if any(token in text.lower() for token in intent['tokens']):
                     if intent['answer']:
                         text_to_send = intent['answer']
                     else:
@@ -131,6 +132,7 @@ class Bot:
             if next_step['next_step']:
                 state.step_name = step['next_step']
             else:
+                log.info('Пользователь {name} {email} успешно прошёл регистрацию.'.format(**state.context))
                 self.user_states.pop(user_id)
         else:
             text_to_send = step['failure_text'].format(**state.context)
