@@ -2,6 +2,8 @@ certifi==2024.2.2
 charset-normalizer==3.3.2
 coverage==7.5.1
 idna==3.7
+pony==0.7.17
+psycopg2==2.9.9
 requests==2.31.0
 urllib3==2.2.1
 vk-api==11.9.9

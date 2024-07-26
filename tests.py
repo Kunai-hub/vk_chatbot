@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import unittest
 from unittest import TestCase
 from unittest.mock import patch, Mock, ANY
