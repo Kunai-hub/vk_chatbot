@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from pony.orm import Database, Required
-from psycopg2.extensions import JSON
+from pony.orm import Database, Required, Json
 
 import settings
 
@@ -11,6 +10,23 @@ db.bind(**settings.DATABASE_CONFIG)
 
 
 class UserState(db.Entity):
-    scenrio_name = Required(str)
+    """
+    Состояние пользователя внутри сценария.
+    """
+
+    user_id = Required(str, unique=True)
+    scenario_name = Required(str)
     step_name = Required(str)
-    context = Required(JSON)
+    context = Required(Json)
+
+
+class Registration(db.Entity):
+    """
+    Заявки на регистрацию.
+    """
+
+    name = Required(str)
+    email = Required(str)
+
+
+db.generate_mapping(create_tables=True)
