@@ -6,9 +6,18 @@ from unittest.mock import patch, Mock, ANY
 from copy import deepcopy
 
 from vk_api.bot_longpoll import VkBotMessageEvent
+from pony.orm import db_session, rollback
 
 import settings
 from bot import Bot
+
+
+def isolate_database(test_func):
+    def wrapper(*args, **kwargs):
+        with db_session:
+            test_func(*args, **kwargs)
+            rollback()
+    return wrapper
 
 
 class Test1(TestCase):
@@ -91,6 +100,7 @@ class Test1(TestCase):
                 bot.on_event.assert_any_call(obj)
                 assert bot.on_event.call_count == count
 
+    @isolate_database
     def test_send_message(self):
         """
         Тест на отправку сообщения по интенту или сценарию.
