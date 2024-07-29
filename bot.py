@@ -6,6 +6,7 @@ import random
 import vk_api
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from pony.orm import db_session
+import requests
 
 import handlers
 from models import UserState, Registration
@@ -102,6 +103,7 @@ class Bot:
         scenario = settings.SCENARIOS[scenario_name]
         first_step = scenario['first_step']
         step = scenario['steps'][first_step]
+
         self.send_step(step=step, user_id=user_id, text=text, context={})
         UserState(user_id=str(user_id), scenario_name=scenario_name, step_name=first_step, context={})
 
@@ -126,10 +128,11 @@ class Bot:
     def send_step(self, step, user_id, text, context):
         if 'text' in step:
             self.send_text(text_to_send=step['text'].format(**context), user_id=user_id)
+
         if 'image' in step:
             handler = getattr(handlers, step['image'])
             image = handler(text=text, context=context)
-            self.send_image(image_to_send=image, user_id=user_id)
+            self.send_image(image=image, user_id=user_id)
 
     def send_text(self, text_to_send, user_id):
         self.get_api.messages.send(
@@ -138,8 +141,27 @@ class Bot:
             peer_id=user_id,
         )
 
-    def send_image(self, image_to_send, user_id):
-        pass # TODO
+    def send_image(self, image, user_id):
+        # upload_url = self.get_api.photos.getMessagesUploadServer()['upload_url']
+        # upload_data = requests.post(url=upload_url, files={'photo': ('image.png', image, 'image/png')}).json()
+        # image_data = self.get_api.photos.saveMessagesPhoto(**upload_data)
+        #
+        # owner_id = image_data[0]['owner_id']
+        # photo_id = image_data[0]['id']
+        # image_id = f'photo{owner_id}_{photo_id}'
+
+        upload = vk_api.VkUpload(self.vk_api)
+        photo = upload.photo_messages(image)
+        owner_id = photo[0]['owner_id']
+        photo_id = photo[0]['id']
+        access_key = photo[0]['access_key']
+        image_id = f'photo{owner_id}_{photo_id}_{access_key}'
+
+        self.get_api.messages.send(
+            attachment=image_id,
+            random_id=random.randint(0, 2 ** 20),
+            peer_id=user_id,
+        )
 
 
 if __name__ == '__main__':
