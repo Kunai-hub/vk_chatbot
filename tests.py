@@ -10,6 +10,7 @@ from pony.orm import db_session, rollback
 
 import settings
 from bot import Bot
+from create_invitation import generate_invitation
 
 
 def isolate_database(test_func):
@@ -86,6 +87,7 @@ class Test1(TestCase):
         count = 5
         obj = {'a': 1}
         events = [obj] * count  # [obj, obj, ...]
+
         # long_poller_mock = Mock(return_value=events)
         long_poller_listen_mock = Mock()
         long_poller_listen_mock.listen = Mock(return_value=events)  # = long_poller_mock
@@ -109,6 +111,7 @@ class Test1(TestCase):
         """
         events = []
         send_mock = Mock()
+
         get_api_mock = Mock()
         get_api_mock.messages.send = send_mock
 
@@ -128,10 +131,25 @@ class Test1(TestCase):
         assert send_mock.call_count == len(self.INPUTS)
 
         real_outputs = []
+
         for call in send_mock.call_args_list:
             args, kwargs = call
             real_outputs.append(kwargs['message'])
+
         assert real_outputs == self.OUTPUTS
+
+    def test_create_invitation(self):
+        with open('files_data/Email.png', 'rb') as avatar_file:
+            avatar_mock = Mock()
+            avatar_mock.content = avatar_file.read()
+
+        with patch('requests.get', return_value=avatar_mock):
+            invitation_file = generate_invitation('Name', 'Email')
+
+        with open('files_data/example_invitation.png', 'rb') as example_invitation_file:
+            example_invitation_bytes = example_invitation_file.read()
+
+        assert invitation_file.read() == example_invitation_bytes
 
 
 if __name__ == '__main__':

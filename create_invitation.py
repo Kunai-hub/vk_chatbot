@@ -39,7 +39,8 @@ def generate_invitation(name, email):
 
     base.paste(avatar, AVATAR_OFFSET)
 
-    base.show()
+    temp_file = BytesIO()
+    base.save(temp_file, 'png')
+    temp_file.seek(0)
 
-
-# generate_invitation('kunai', 'Depp')
+    return temp_file
