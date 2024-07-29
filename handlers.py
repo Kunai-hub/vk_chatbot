@@ -2,6 +2,8 @@
 
 import re
 
+from create_invitation import generate_invitation
+
 """
 Handler - функция, которая принимает на вход text (входящее сообщение) и context (dict), а возвращает bool:
 True, если шаг успешно пройдет или False, если предоставленные данные неверные.
@@ -28,3 +30,7 @@ def handle_email(text, context):
         return True
     else:
         return False
+
+
+def handle_image(text, context):
+    return generate_invitation(name=context['name'], email=context['email'])

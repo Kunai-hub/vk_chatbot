@@ -124,7 +124,7 @@ class Test1(TestCase):
         long_poller_listen_mock.listen = Mock(return_value=events)
 
         with patch('bot.VkBotLongPoll', return_value=long_poller_listen_mock):
-            bot = Bot('', '')
+            bot = Bot(group_id='', token='')
             bot.get_api = get_api_mock
             bot.run()
 
@@ -144,7 +144,7 @@ class Test1(TestCase):
             avatar_mock.content = avatar_file.read()
 
         with patch('requests.get', return_value=avatar_mock):
-            invitation_file = generate_invitation('Name', 'Email')
+            invitation_file = generate_invitation(name='Name', email='Email')
 
         with open('files_data/example_invitation.png', 'rb') as example_invitation_file:
             example_invitation_bytes = example_invitation_file.read()
