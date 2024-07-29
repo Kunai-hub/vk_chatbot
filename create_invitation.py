@@ -14,8 +14,8 @@ FONT_COLOR = (0, 0, 0)
 NAME_OFFSET = (270, 298)
 EMAIL_OFFSET = (270, 350)
 
-AVATAR_SIZE = '100x100'
-AVATAR_OFFSET = (80, 290)
+AVATAR_SIZE = '150x150'
+AVATAR_OFFSET = (65, 250)
 
 
 def generate_invitation(name, email):
