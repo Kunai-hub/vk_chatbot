@@ -46,10 +46,10 @@ SCENARIOS = {
                 'text': '{name}, спасибо за регистрацию!\n'
                         'Ниже прикреплен Ваш билет.\n'
                         'Копию мы отправили на {email}. Можете его распечатать.',
+                'image': 'handle_image',
                 'failure_text': None,
                 'handler': None,
                 'next_step': None
-
             }
         }
     }
