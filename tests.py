@@ -141,6 +141,11 @@ class Test1(TestCase):
         assert real_outputs == self.OUTPUTS
 
     def test_create_invitation(self):
+        """
+        Тест на создание приглашения.
+
+        :return: None
+        """
         with open('files_data/Email.png', 'rb') as avatar_file:
             avatar_mock = Mock()
             avatar_mock.content = avatar_file.read()

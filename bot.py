@@ -72,7 +72,7 @@ class Bot:
     @db_session
     def on_event(self, event):
         """
-        Отправляет сообщение назад, если это текст.
+        Отправка сообщения или картинки по интенту или сценарию пользователю.
 
         :param event: VKBotMessageEvent object
         :return: None
@@ -100,6 +100,14 @@ class Bot:
                 self.send_text(text_to_send=settings.DEFAULT_ANSWER, user_id=user_id)
 
     def start_scenario(self, user_id, scenario_name, text):
+        """
+        Запуск сценария.
+
+        :param user_id: peer_id пользователя
+        :param scenario_name: имя сценария
+        :param text: текст, который ввел пользователь
+        :return: None
+        """
         scenario = settings.SCENARIOS[scenario_name]
         first_step = scenario['first_step']
         step = scenario['steps'][first_step]
@@ -108,6 +116,14 @@ class Bot:
         UserState(user_id=str(user_id), scenario_name=scenario_name, step_name=first_step, context={})
 
     def continue_scenario(self, text, state, user_id):
+        """
+        Продолжение сценария.
+
+        :param text: текст, который ввел пользователь
+        :param state: состояние пользователя внутри сценария на текущий момент
+        :param user_id: peer_id пользователя
+        :return: None
+        """
         steps = settings.SCENARIOS[state.scenario_name]['steps']
         step = steps[state.step_name]
         handler = getattr(handlers, step['handler'])
@@ -126,24 +142,46 @@ class Bot:
             self.send_text(text_to_send=text_to_send, user_id=user_id)
 
     def send_step(self, step, user_id, text, context):
+        """
+        Отправка текста и/или вложения на текущее состояние пользователя.
+
+        :param step: шаг, на котором пользователь в текущий момент
+        :param user_id: peer_id пользователя
+        :param text: текст, который ввел пользователь
+        :param context: некий словарь, хранящий данные о пользователе
+        :return: None
+        """
         if 'text' in step:
             self.send_text(text_to_send=step['text'].format(**context), user_id=user_id)
 
         if 'image' in step:
             handler = getattr(handlers, step['image'])
             image = handler(text=text, context=context)
-            self.send_image(image=image, user_id=user_id)
+            self.send_image(image_to_send=image, user_id=user_id)
 
     def send_text(self, text_to_send, user_id):
+        """
+        Отправка текста пользователю.
+
+        :param text_to_send: текст, который нужно отправить пользователю
+        :param user_id: peer_id пользователя
+        """
         self.get_api.messages.send(
             message=text_to_send,
             random_id=random.randint(0, 2 ** 20),
             peer_id=user_id,
         )
 
-    def send_image(self, image, user_id):
+    def send_image(self, image_to_send, user_id):
+        """
+        Отправка вложения пользователю.
+
+        :param image_to_send: вложение, который нужно отправить пользователю
+        :param user_id: peer_id пользователя
+        :return: None
+        """
         # upload_url = self.get_api.photos.getMessagesUploadServer()['upload_url']
-        # upload_data = requests.post(url=upload_url, files={'photo': ('image.png', image, 'image/png')}).json()
+        # upload_data = requests.post(url=upload_url, files={'photo': ('image.png', image_to_send, 'image/png')}).json()
         # image_data = self.get_api.photos.saveMessagesPhoto(**upload_data)
         #
         # owner_id = image_data[0]['owner_id']
@@ -151,7 +189,7 @@ class Bot:
         # image_id = f'photo{owner_id}_{photo_id}'
 
         upload = vk_api.VkUpload(self.vk_api)
-        photo = upload.photo_messages(image)
+        photo = upload.photo_messages(image_to_send)
         owner_id = photo[0]['owner_id']
         photo_id = photo[0]['id']
         access_key = photo[0]['access_key']
